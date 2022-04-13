@@ -1,0 +1,133 @@
+---
+title: "chyron_frequency_analysis"
+author: "Lindsey Greenhill"
+date: "4/12/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Loading necessary packages
+library(gt)
+library(quanteda)
+library(broom)
+library(skimr)
+library(lubridate)
+library(janitor)
+library(dotwhisker)
+library(textdata)
+library(tidytext)
+library(haven)
+library(ggthemes)
+library(webshot)
+library(stargazer)
+library(tidyverse)
+library(patchwork)
+library(tidytext)
+library(ggrepel)
+library(ggpubr)
+
+load("Gov94sd_final_project_data/tweets/news_chyrons_combined.RData")
+
+chyrons <- dataset
+```
+
+# By channel
+
+## School Board
+
+```{r}
+
+sb_df <- chyrons %>%
+  mutate(text = tolower(text),
+         mention = grepl("school board", text)) %>%
+  filter(mention) %>%
+  mutate(channel = as_factor(channel),
+         channel = relevel(channel, ref = "FOXNEWSW"))
+
+# creating a chyron ID
+
+sb_df$chyron_id <- seq.int(nrow(sb_df))
+
+# It looks like the distribution by channel isn't crazy different
+
+sb_chyron_counts <- chyrons %>%
+  mutate(text = tolower(text),
+         mention = grepl("school board", text)) %>%
+  filter(mention) %>%
+  count(date, channel) %>%
+  ggplot(aes(x = date, y = n)) +
+  geom_col() +
+  facet_wrap(~channel) +
+  theme_clean() +
+  labs(title = "Chyrons that mention School Board",
+       x = "",
+       y = "# Chyrons")
+
+```
+
+## Mask Mandate
+
+```{r}
+mm_chyron_counts <- chyrons %>%
+  mutate(text = tolower(text),
+         mention = grepl("school mask mandate", text)) %>%
+  filter(mention) %>%
+  count(date, channel) %>%
+  ggplot(aes(x = date, y = n)) +
+  geom_col() +
+  facet_wrap(~channel) +
+  theme_clean() +
+  labs(title = "Chyrons that mention School Mask Mandaate",
+       x = "",
+       y = "# Chyrons")
+```
+
+## Critical Race Theory
+
+```{r}
+crt_chyron_counts <- chyrons %>%
+  mutate(text = tolower(text),
+         mention = grepl("critical race theory", text)) %>%
+  filter(mention) %>%
+  count(date, channel) %>%
+  ggplot(aes(x = date, y = n)) +
+  geom_col() +
+  facet_wrap(~channel) +
+  theme_clean() +
+  labs(title = "Chyrons that mention CRT",
+       x = "",
+       y = "# Chyrons")
+```
+
+# Aggregated
+
+```{r}
+mm_chyron_counts_combined <- chyrons %>%
+  mutate(text = tolower(text),
+         mention = grepl("school mask mandate", text)) %>%
+  filter(mention) %>%
+  count(date, channel) %>%
+  ggplot(aes(x = date, y = n)) +
+  geom_col() +
+  theme_clean() +
+  labs(title = "Chyrons that mention School Mask Mandaate",
+       x = "",
+       y = "# Chyrons")
+
+crt_chyron_counts_combined <- chyrons %>%
+  mutate(text = tolower(text),
+         mention = grepl("critical race theory", text)) %>%
+  filter(mention) %>%
+  count(date, channel) %>%
+  ggplot(aes(x = date, y = n)) +
+  geom_col() +
+  theme_clean() +
+  labs(title = "Chyrons that mention CRT",
+       x = "",
+       y = "# Chyrons")
+
+mm_chyron_counts_combined 
+crt_chyron_counts_combined
+```
+
