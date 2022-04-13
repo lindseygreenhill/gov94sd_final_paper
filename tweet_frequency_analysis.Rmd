@@ -1,0 +1,97 @@
+---
+title: "tweet_frequency_analysis"
+author: "Lindsey Greenhill"
+date: "4/13/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Loading necessary packages
+library(gt)
+library(quanteda)
+library(broom)
+library(skimr)
+library(lubridate)
+library(janitor)
+library(dotwhisker)
+library(textdata)
+library(tidytext)
+library(haven)
+library(ggthemes)
+library(webshot)
+library(stargazer)
+library(tidyverse)
+library(patchwork)
+library(tidytext)
+library(ggrepel)
+library(ggpubr)
+
+# loading dtaa
+
+load("Gov94sd_final_project_data/tweets/tweets_combined.RData")
+
+# making this the same date range as the chyrons
+
+tweets_tidy <- tweets_combined %>%
+  select(created_at, screen_name, text, is_retweet, hashtags) %>%
+  filter(is_retweet == FALSE) %>%
+  mutate(date = ymd(str_sub(created_at, 1, 10))) %>%
+  filter(date >= as.Date("2021-08-09"),
+         date <= as.Date("2022-04-03"))
+
+summary(tweets_tidy)
+```
+
+## School Boards
+
+```{r}
+sb_tweet_counts <- tweets_tidy %>%
+  mutate(text = tolower(text),
+         mention = grepl("school board", text)) %>%
+  filter(mention) %>%
+  count(date) %>%
+  ggplot(aes(x = date, y = n)) +
+  geom_col() +
+  theme_clean() +
+  labs(title = "Tweets that mention School Board",
+       x = "",
+       y = "# Tweets")
+```
+
+## Mask Mandate
+
+```{r}
+mm_tweet_counts <- tweets_tidy %>%
+  mutate(text = tolower(text),
+         mention = grepl("school mask mandate", text)) %>%
+  filter(mention) %>%
+  count(date) %>%
+  ggplot(aes(x = date, y = n)) +
+  geom_col() +
+  theme_clean() +
+  labs(title = "Tweets that mention School Mask Mandaate",
+       x = "",
+       y = "# Tweets")
+```
+
+## Critical Race Theory
+
+```{r}
+
+# I am including crt because of the nature of twitter. I guess I should include
+# this for chyrons we well
+
+crt_tweet_counts <- tweets_tidy %>%
+  mutate(text = tolower(text),
+         mention = grepl("critical race theory|crt", text)) %>%
+  filter(mention) %>%
+  count(date) %>%
+  ggplot(aes(x = date, y = n)) +
+  geom_col() +
+  theme_clean() +
+  labs(title = "Tweets that mention CRT",
+       x = "",
+       y = "# Tweets")
+```

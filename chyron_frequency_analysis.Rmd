@@ -88,7 +88,7 @@ mm_chyron_counts <- chyrons %>%
 ```{r}
 crt_chyron_counts <- chyrons %>%
   mutate(text = tolower(text),
-         mention = grepl("critical race theory", text)) %>%
+         mention = grepl("critical race theory|crt", text)) %>%
   filter(mention) %>%
   count(date, channel) %>%
   ggplot(aes(x = date, y = n)) +
